@@ -39,11 +39,8 @@ class BudgetService
             $startedInMonth = Carbon::parse($start)->daysInMonth;
             $endDaysInMonth = Carbon::parse($end)->daysInMonth;
 
-            $dateNumber1 = Carbon::parse($start)->day;
-            $dateNumber2 = Carbon::parse($end)->day;
-
-            $startTotal = $startedInMonth - $dateNumber1 + 1;
-            $endTotal = $dateNumber2;
+            $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
+            $endTotal = Carbon::parse($end)->day;
 
             foreach ($this->queries as $item) {
                 if ($this->isTargetStartMonth($item["YearMonth"], $startDate)) {
