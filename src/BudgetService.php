@@ -21,12 +21,11 @@ class BudgetService
 
     public function query(string $start, string $end)
     {
-        if ($this->isStartDateLessThanEndDate($start, $end)) {
+        if ($this->isInvalidRange($start, $end)) {
             return 0;
         }
         $startDate = date("Ym", strtotime($start));
         $endDate = date("Ym", strtotime($end));
-
         $budget = 0;
 
         if ($this->isSameMonth($startDate, $endDate)) {
@@ -78,7 +77,7 @@ class BudgetService
      * @param string $end
      * @return bool
      */
-    protected function isStartDateLessThanEndDate(string $start, string $end): bool
+    protected function isInvalidRange(string $start, string $end): bool
     {
         return Carbon::parse($start)->diffInDays($end, false) < 0;
     }
