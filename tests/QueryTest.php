@@ -62,6 +62,13 @@ class QueryTest extends TestCase
         $this->shouldBeThatBudget($start, $end, 500);
     }
 
+    public function test_same_month_that_not_exist_budget()
+    {
+        $start = "2021-10-01";
+        $end = "2021-10-31";
+        $this->shouldBeThatBudget($start, $end, 0);
+    }
+
     protected function setUp()
     {
         parent::setUp();
