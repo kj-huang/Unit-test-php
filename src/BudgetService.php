@@ -27,7 +27,6 @@ class BudgetService
         if ($this->isInvalidRange($start, $end)) {
             return 0;
         }
-        $startDate = Carbon::parse($start)->format("Y-m");
         $endDate = Carbon::parse($end)->format("Y-m");
         $budget = 0;
 
@@ -36,7 +35,7 @@ class BudgetService
 
             $betweenDays = 0;
 
-            if ($this->isTargetMonth($newYearMonth, $startDate)) {
+            if ($this->isTargetMonth($newYearMonth, Carbon::parse($start)->format("Y-m"))) {
                 if (Carbon::parse($start)->month !== Carbon::parse($end)->month)
                     $betweenDays = Carbon::parse($start)->endOfMonth()->day - Carbon::parse($start)->day + 1;
                 else $betweenDays = Carbon::parse($start)->endOfMonth()->day - (Carbon::parse($start)->endOfMonth()->day - Carbon::parse($end)->day);
