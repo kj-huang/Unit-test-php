@@ -40,16 +40,14 @@ class BudgetService
 
             if ($this->isTargetStartMonth($item["YearMonth"], $startDate)) {
                 if ($this->isSameMonth($startDate, $endDate)) {
-                    $dateNumber1 = Carbon::parse($start)->diffInDays($end, false) + 1;
-                    $daysInMonth1 = Carbon::parse($startDate)->daysInMonth;
-                    return floor($item["Amount"] * $dateNumber1 / $daysInMonth1);
+                    $betweenDays = Carbon::parse($start)->diffInDays($end, false) + 1;
+                    $daysInMonth = Carbon::parse($startDate)->daysInMonth;
+                    return floor($item["Amount"] * $betweenDays / $daysInMonth);
                 } else $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
-            } else {
-                if ($this->isInMiddleMonth($item["YearMonth"], $start, $end, $endDate)) {
-                    $budget += floor($item["Amount"]);
-                } else if ($this->isTargetEndMonth($item["YearMonth"], $endDate)) {
-                    $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
-                }
+            } elseif ($this->isInMiddleMonth($item["YearMonth"], $start, $end, $endDate)) {
+                $budget += floor($item["Amount"]);
+            } else if ($this->isTargetEndMonth($item["YearMonth"], $endDate)) {
+                $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
             }
         }
 
