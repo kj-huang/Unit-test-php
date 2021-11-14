@@ -34,14 +34,13 @@ class BudgetService
 
             $betweenDays = 0;
 
-            $endDate = Carbon::parse($end)->format("Y-m");
             if ($this->isTargetMonth($newYearMonth, Carbon::parse($start)->format("Y-m"))) {
                 if (Carbon::parse($start)->month !== Carbon::parse($end)->month)
                     $betweenDays = Carbon::parse($start)->endOfMonth()->day - Carbon::parse($start)->day + 1;
                 else $betweenDays = Carbon::parse($start)->endOfMonth()->day - (Carbon::parse($start)->endOfMonth()->day - Carbon::parse($end)->day);
             } else if ($this->isInMiddleMonth($newYearMonth, $start, $end)) {
                 $betweenDays = Carbon::parse($newYearMonth)->endOfMonth()->day;
-            } else if ($this->isTargetMonth($newYearMonth, $endDate)) {
+            } else if ($this->isTargetMonth($newYearMonth, Carbon::parse($end)->format("Y-m"))) {
                 $betweenDays = Carbon::parse($end)->day;
             }
 
