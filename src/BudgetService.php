@@ -95,12 +95,13 @@ class BudgetService
             $overlappingEnd = Carbon::parse($end)->day;
         }
 
-        //TODO code smell: but making this code can extract method later
-        if ($overlappingEnd - $overlappingStart > 0) {
-            $overlappingDays = $overlappingEnd - $overlappingStart + 1;
-        } else {
-            $overlappingDays = 0;
-        }
-        return $overlappingDays;
+//        //TODO code smell: but making this code can extract method later
+//        if ($overlappingEnd - $overlappingStart > 0) {
+//            $overlappingDays = $overlappingEnd - $overlappingStart + 1;
+//        } else {
+//            $overlappingDays = 0;
+//        }
+//        return $overlappingDays;
+        return $overlappingEnd - $overlappingStart > 0 ? $overlappingEnd - $overlappingStart + 1 : 0;
     }
 }
