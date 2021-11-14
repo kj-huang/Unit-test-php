@@ -14,8 +14,8 @@ class Budget
     private $amount;
 
     /**
-     * @param string $string
-     * @param int $int
+     * @param string $yearMonth
+     * @param int $amount
      */
     public function __construct(string $yearMonth, int $amount)
     {
@@ -37,5 +37,10 @@ class Budget
     public function getYearMonth(): string
     {
         return $this->yearMonth;
+    }
+
+    public function getFormatCurrentDateTime(): string
+    {
+        return substr($this->getYearMonth(), 0, 4) . "-" . substr($this->getYearMonth(), 4, 2);
     }
 }
