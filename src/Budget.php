@@ -56,4 +56,12 @@ class Budget
     {
         return Carbon::parse($this->getFormatCurrentDateTime())->startOfMonth()->day;
     }
+
+    /**
+     * @return string
+     */
+    public function getLastDay(): string
+    {
+        return Carbon::parse($this->getFormatCurrentDateTime())->endOfMonth()->day;
+    }
 }
