@@ -29,9 +29,10 @@ class BudgetService
         }
         $budget = 0;
 
-        foreach ($this->queries as $budgetEntity) {
-            $current = substr($budgetEntity["YearMonth"], 0, 4) . "-" . substr($budgetEntity["YearMonth"], 4, 2);
+        foreach ($this->queries as $b => $budgetEntity) {
 
+//            $current = substr($budgetEntity["YearMonth"], 0, 4) . "-" . substr($budgetEntity["YearMonth"], 4, 2);
+            $current = substr($budgetEntity->getYearMonth(), 0, 4) . "-" . substr($budgetEntity->getYearMonth(), 4, 2);
             $overlappingEnd = 0;
             $overlappingStart = 0;
             if ($this->isTargetMonth($current, Carbon::parse($start)->format("Y-m"))) {
@@ -55,7 +56,8 @@ class BudgetService
                 continue;
             }
             $overlappingDays = $overlappingEnd - $overlappingStart + 1;
-            $budget += floor($budgetEntity["Amount"] * $overlappingDays / Carbon::parse($current)->daysInMonth);
+//            $budget += floor($budgetEntity["Amount"] * $overlappingDays / Carbon::parse($current)->daysInMonth);
+            $budget += floor($budgetEntity->getAmount() * $overlappingDays / Carbon::parse($current)->daysInMonth);
         }
 
         return $budget;

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Budget;
 use App\BudgetService;
 use App\IBudgetRepo;
 use PHPUnit\Framework\TestCase;
@@ -94,18 +95,9 @@ class QueryTest extends TestCase
     {
         $mockRepo = \Mockery::mock(IBudgetRepo::class);
         $mockRepo->shouldReceive('getAll')->andReturn([
-            [
-                'YearMonth' => "202111",
-                'Amount' => 3000
-            ],
-            [
-                'YearMonth' => "202112",
-                'Amount' => 3100
-            ],
-            [
-                'YearMonth' => "202201",
-                'Amount' => 3100
-            ],
+            "0" => new Budget("202111", 3000),
+            "1" => new Budget("202112", 3100),
+            "2" => new Budget("202201", 3100),
         ]);
         return $mockRepo;
     }
