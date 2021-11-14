@@ -27,8 +27,8 @@ class BudgetService
         if ($this->isInvalidRange($start, $end)) {
             return 0;
         }
-        $startDate = Carbon::parse($start)->format("Ym");
-        $endDate = Carbon::parse($end)->format("Ym");
+        $startDate = Carbon::parse($start)->format("Y-m");
+        $endDate = Carbon::parse($end)->format("Y-m");
         $budget = 0;
 
         foreach ($this->queries as $item) {
@@ -38,15 +38,19 @@ class BudgetService
             $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
             $endTotal = Carbon::parse($end)->day;
 
-            if ($this->isTargetStartMonth($item["YearMonth"], $startDate)) {
+            $newYearMonth = substr($item["YearMonth"], 0, 4) . "-" . substr($item["YearMonth"], 4, 2);
+
+            if ($this->isTargetStartMonth($newYearMonth, $startDate)) {
                 if ($this->isSameMonth($startDate, $endDate)) {
                     $betweenDays = Carbon::parse($start)->diffInDays($end, false) + 1;
                     $daysInMonth = Carbon::parse($startDate)->daysInMonth;
                     return floor($item["Amount"] * $betweenDays / $daysInMonth);
-                } else $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
-            } elseif ($this->isInMiddleMonth($item["YearMonth"], $start, $end, $endDate)) {
+                } else {
+                    $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
+                }
+            } elseif ($this->isInMiddleMonth($newYearMonth, $start, $end, $endDate)) {
                 $budget += floor($item["Amount"]);
-            } else if ($this->isTargetEndMonth($item["YearMonth"], $endDate)) {
+            } else if ($this->isTargetEndMonth($newYearMonth, $endDate)) {
                 $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
             }
         }
@@ -81,7 +85,7 @@ class BudgetService
      */
     protected function isTargetStartMonth($yearMonth, $startDate): bool
     {
-        return $yearMonth === $startDate;
+        return Carbon::parse($yearMonth)->isSameMonth($startDate);
     }
 
     /**
@@ -92,7 +96,7 @@ class BudgetService
      */
     protected function isTargetEndMonth($yearMonth, $endDate): bool
     {
-        return $yearMonth === $endDate;
+        return Carbon::parse($yearMonth)->isSameMonth($endDate);
     }
 
     /**
@@ -104,7 +108,6 @@ class BudgetService
      */
     protected function isInMiddleMonth($yearMonth, string $start, string $end, $endDate): bool
     {
-        return Carbon::create(substr($yearMonth, 0, 4), substr($yearMonth, 4, 2))->between($start, $end) && $yearMonth !== $endDate;
+        return Carbon::parse($yearMonth)->between($start, $end) && Carbon::parse($yearMonth)->format("Y-m") !== $endDate;
     }
-
 }
