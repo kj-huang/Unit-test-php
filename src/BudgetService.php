@@ -41,9 +41,11 @@ class BudgetService
             } else if ($this->isInMiddleMonth($current, $start, $end)) {
                 $overlappingDays = Carbon::parse($current)->endOfMonth()->day;
             } else if ($this->isTargetMonth($current, Carbon::parse($end)->format("Y-m"))) {
-                $overlappingDays = Carbon::parse($end)->day;
+//                $overlappingDays = Carbon::parse($end)->day;
+                $overlappingStart = Carbon::parse($end)->startOfMonth();
+                $overlappingEnd = Carbon::parse($end)->day;
+                $overlappingDays = $overlappingEnd - $overlappingStart + 1;
             }
-
             $budget += floor($item["Amount"] * $overlappingDays / Carbon::parse($current)->daysInMonth);
         }
 
