@@ -30,34 +30,7 @@ class BudgetService
         $budget = 0;
 
         foreach ($this->queries as $b => $budgetEntity) {
-
-            $current = $budgetEntity->getFormatCurrentDateTime();
-            $overlappingEnd = 0;
-            $overlappingStart = 0;
-            if ($this->isTargetMonth($current, Carbon::parse($start)->format("Y-m"))) {
-                if (Carbon::parse($start)->month !== Carbon::parse($end)->month) {
-                    $overlappingEnd = $budgetEntity->getLastDay();
-                    $overlappingStart = Carbon::parse($start)->day;
-                } else {
-                    $overlappingEnd = $budgetEntity->getLastDay();
-                    $overlappingStart = $budgetEntity->getLastDay() - Carbon::parse($end)->day + 1;
-                }
-            } else if ($this->isInMiddleMonth($current, $start, $end)) {
-                $overlappingStart = $budgetEntity->getFirstDay();
-                $overlappingEnd = $budgetEntity->getLastDay();
-            } else if ($this->isTargetMonth($current, Carbon::parse($end)->format("Y-m"))) {
-                $overlappingStart = $budgetEntity->getFirstDay();
-                $overlappingEnd = Carbon::parse($end)->day;
-            }
-
-            //TODO code smell: but making this code can extract method later
-            if ($overlappingEnd - $overlappingStart > 0) {
-                $overlappingDays = $overlappingEnd - $overlappingStart + 1;
-            } else {
-                $overlappingDays = 0;
-            }
-
-//            $budget += floor($budgetEntity->getAmount() * $overlappingDays / Carbon::parse($current)->daysInMonth);
+            $overlappingDays = $this->getOverlappingDays($budgetEntity, $start, $end);
             $budget += floor($budgetEntity->getAmount() * $overlappingDays / $budgetEntity->currentDaysInMonth());
         }
 
@@ -93,5 +66,41 @@ class BudgetService
     protected function isInMiddleMonth($yearMonth, string $start, string $end): bool
     {
         return Carbon::parse($yearMonth)->between($start, $end) && Carbon::parse($yearMonth)->format("Y-m") !== Carbon::parse($end)->format("Y-m");;
+    }
+
+    /**
+     * @param $budgetEntity
+     * @param string $start
+     * @param string $end
+     * @return int|mixed
+     */
+    protected function getOverlappingDays($budgetEntity, string $start, string $end)
+    {
+        $current = $budgetEntity->getFormatCurrentDateTime();
+        $overlappingEnd = 0;
+        $overlappingStart = 0;
+        if ($this->isTargetMonth($current, Carbon::parse($start)->format("Y-m"))) {
+            if (Carbon::parse($start)->month !== Carbon::parse($end)->month) {
+                $overlappingEnd = $budgetEntity->getLastDay();
+                $overlappingStart = Carbon::parse($start)->day;
+            } else {
+                $overlappingEnd = $budgetEntity->getLastDay();
+                $overlappingStart = $budgetEntity->getLastDay() - Carbon::parse($end)->day + 1;
+            }
+        } else if ($this->isInMiddleMonth($current, $start, $end)) {
+            $overlappingStart = $budgetEntity->getFirstDay();
+            $overlappingEnd = $budgetEntity->getLastDay();
+        } else if ($this->isTargetMonth($current, Carbon::parse($end)->format("Y-m"))) {
+            $overlappingStart = $budgetEntity->getFirstDay();
+            $overlappingEnd = Carbon::parse($end)->day;
+        }
+
+        //TODO code smell: but making this code can extract method later
+        if ($overlappingEnd - $overlappingStart > 0) {
+            $overlappingDays = $overlappingEnd - $overlappingStart + 1;
+        } else {
+            $overlappingDays = 0;
+        }
+        return $overlappingDays;
     }
 }
