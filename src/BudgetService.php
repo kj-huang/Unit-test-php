@@ -46,7 +46,9 @@ class BudgetService
                     $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
                 }
             } elseif ($this->isInMiddleMonth($newYearMonth, $start, $end, $endDate)) {
-                $budget += floor($item["Amount"]);
+                $endDaysInMonth = Carbon::parse($newYearMonth)->daysInMonth;
+                $endTotal = Carbon::parse($newYearMonth)->endOfMonth()->day;
+                $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
             } else if ($this->isTargetMonth($newYearMonth, $endDate)) {
                 $endDaysInMonth = Carbon::parse($end)->daysInMonth;
                 $endTotal = Carbon::parse($end)->day;
