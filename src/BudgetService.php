@@ -50,7 +50,7 @@ class BudgetService
                 }
             } elseif ($this->isInMiddleMonth($newYearMonth, $start, $end, $endDate)) {
                 $budget += floor($item["Amount"]);
-            } else if ($this->isTargetEndMonth($newYearMonth, $endDate)) {
+            } else if ($this->isTargetStartMonth($newYearMonth, $endDate)) {
                 $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
             }
         }
@@ -86,17 +86,6 @@ class BudgetService
     protected function isTargetStartMonth($yearMonth, $startDate): bool
     {
         return Carbon::parse($yearMonth)->isSameMonth($startDate);
-    }
-
-    /**
-     * @param int $flag
-     * @param $yearMonth
-     * @param $endDate
-     * @return bool
-     */
-    protected function isTargetEndMonth($yearMonth, $endDate): bool
-    {
-        return Carbon::parse($yearMonth)->isSameMonth($endDate);
     }
 
     /**
