@@ -40,7 +40,7 @@ class BudgetService
 
             $newYearMonth = substr($item["YearMonth"], 0, 4) . "-" . substr($item["YearMonth"], 4, 2);
 
-            if ($this->isTargetStartMonth($newYearMonth, $startDate)) {
+            if ($this->isTargetMonth($newYearMonth, $startDate)) {
                 if ($this->isSameMonth($startDate, $endDate)) {
                     $betweenDays = Carbon::parse($start)->diffInDays($end, false) + 1;
                     $daysInMonth = Carbon::parse($startDate)->daysInMonth;
@@ -50,7 +50,7 @@ class BudgetService
                 }
             } elseif ($this->isInMiddleMonth($newYearMonth, $start, $end, $endDate)) {
                 $budget += floor($item["Amount"]);
-            } else if ($this->isTargetStartMonth($newYearMonth, $endDate)) {
+            } else if ($this->isTargetMonth($newYearMonth, $endDate)) {
                 $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
             }
         }
@@ -83,7 +83,7 @@ class BudgetService
      * @param $startDate
      * @return bool
      */
-    protected function isTargetStartMonth($yearMonth, $startDate): bool
+    protected function isTargetMonth($yearMonth, $startDate): bool
     {
         return Carbon::parse($yearMonth)->isSameMonth($startDate);
     }
