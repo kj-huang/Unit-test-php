@@ -30,34 +30,30 @@ class BudgetService
         $endDate = Carbon::parse($end)->format("Ym");
         $budget = 0;
 
-        if ($this->isSameMonth($startDate, $endDate)) {
-            foreach ($this->queries as $item) {
-                if ($this->isTargetStartMonth($item["YearMonth"], $startDate)) {
-                    list($dateNumber, $daysInMonth) = $this->getSameMonthPercentage($start, $end, $startDate);
-                    return floor($item["Amount"] * $dateNumber / $daysInMonth);
-                }
-            }
-        } else {
-            $startedInMonth = Carbon::parse($start)->daysInMonth;
-            $endDaysInMonth = Carbon::parse($end)->daysInMonth;
+        foreach ($this->queries as $item) {
+            if ($this->isSameMonth($startDate, $endDate) && $this->isTargetStartMonth($item["YearMonth"], $startDate)) {
+                list($dateNumber, $daysInMonth) = $this->getSameMonthPercentage($start, $end, $startDate);
+                return floor($item["Amount"] * $dateNumber / $daysInMonth);
+            } else {
+                $startedInMonth = Carbon::parse($start)->daysInMonth;
+                $endDaysInMonth = Carbon::parse($end)->daysInMonth;
 
-            $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
-            $endTotal = Carbon::parse($end)->day;
+                $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
+                $endTotal = Carbon::parse($end)->day;
 
-            foreach ($this->queries as $item) {
                 if ($this->isTargetStartMonth($item["YearMonth"], $startDate)) {
                     $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
                 } else {
                     if ($this->isInMiddleMonth($item["YearMonth"], $start, $end, $endDate)) {
-                        $budget += $item["Amount"];
+                        $budget += floor($item["Amount"]);
                     } else if ($this->isTargetEndMonth($item["YearMonth"], $endDate)) {
                         $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
-                        break;
                     }
                 }
             }
         }
-        return floor($budget);
+        
+        return $budget;
     }
 
     /**
