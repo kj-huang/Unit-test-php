@@ -64,16 +64,6 @@ class BudgetService
     }
 
     /**
-     * @param $startDate
-     * @param $endDate
-     * @return bool
-     */
-    protected function isSameMonth($startDate, $endDate): bool
-    {
-        return $startDate === $endDate;
-    }
-
-    /**
      * @param $yearMonth
      * @param $startDate
      * @return bool
