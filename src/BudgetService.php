@@ -27,7 +27,6 @@ class BudgetService
         if ($this->isInvalidRange($start, $end)) {
             return 0;
         }
-        $endDate = Carbon::parse($end)->format("Y-m");
         $budget = 0;
 
         foreach ($this->queries as $item) {
@@ -35,11 +34,12 @@ class BudgetService
 
             $betweenDays = 0;
 
+            $endDate = Carbon::parse($end)->format("Y-m");
             if ($this->isTargetMonth($newYearMonth, Carbon::parse($start)->format("Y-m"))) {
                 if (Carbon::parse($start)->month !== Carbon::parse($end)->month)
                     $betweenDays = Carbon::parse($start)->endOfMonth()->day - Carbon::parse($start)->day + 1;
                 else $betweenDays = Carbon::parse($start)->endOfMonth()->day - (Carbon::parse($start)->endOfMonth()->day - Carbon::parse($end)->day);
-            } else if ($this->isInMiddleMonth($newYearMonth, $start, $end, $endDate)) {
+            } else if ($this->isInMiddleMonth($newYearMonth, $start, $end)) {
                 $betweenDays = Carbon::parse($newYearMonth)->endOfMonth()->day;
             } else if ($this->isTargetMonth($newYearMonth, $endDate)) {
                 $betweenDays = Carbon::parse($end)->day;
@@ -75,11 +75,10 @@ class BudgetService
      * @param $yearMonth
      * @param string $start
      * @param string $end
-     * @param $endDate
      * @return bool
      */
-    protected function isInMiddleMonth($yearMonth, string $start, string $end, $endDate): bool
+    protected function isInMiddleMonth($yearMonth, string $start, string $end): bool
     {
-        return Carbon::parse($yearMonth)->between($start, $end) && Carbon::parse($yearMonth)->format("Y-m") !== $endDate;
+        return Carbon::parse($yearMonth)->between($start, $end) && Carbon::parse($yearMonth)->format("Y-m") !== Carbon::parse($end)->format("Y-m");;
     }
 }
