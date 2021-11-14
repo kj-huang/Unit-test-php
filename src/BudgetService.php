@@ -32,30 +32,33 @@ class BudgetService
         foreach ($this->queries as $item) {
             $current = substr($item["YearMonth"], 0, 4) . "-" . substr($item["YearMonth"], 4, 2);
 
-            $overlappingDays = 0;
+//            $overlappingDays = 0;
 
+            $overlappingEnd = 0;
+            $overlappingStart = 0;
             if ($this->isTargetMonth($current, Carbon::parse($start)->format("Y-m"))) {
-//                if (Carbon::parse($start)->month !== Carbon::parse($end)->month)
-//                    $overlappingDays = Carbon::parse($start)->endOfMonth()->day - Carbon::parse($start)->day + 1;
-//                else $overlappingDays = Carbon::parse($start)->endOfMonth()->day - (Carbon::parse($start)->endOfMonth()->day - Carbon::parse($end)->day);
                 if (Carbon::parse($start)->month !== Carbon::parse($end)->month) {
                     $overlappingEnd = Carbon::parse($start)->endOfMonth()->day;
                     $overlappingStart = Carbon::parse($start)->day;
-                    $overlappingDays = $overlappingEnd - $overlappingStart + 1;
+//                    $overlappingDays = $overlappingEnd - $overlappingStart + 1;
                 } else {
                     $overlappingEnd = Carbon::parse($start)->endOfMonth()->day;
                     $overlappingStart = Carbon::parse($start)->endOfMonth()->day - Carbon::parse($end)->day + 1;
-                    $overlappingDays = $overlappingEnd - $overlappingStart + 1;
+//                    $overlappingDays = $overlappingEnd - $overlappingStart + 1;
                 }
             } else if ($this->isInMiddleMonth($current, $start, $end)) {
                 $overlappingStart = Carbon::parse($current)->startOfMonth()->day;
                 $overlappingEnd = Carbon::parse($current)->endOfMonth()->day;
-                $overlappingDays = $overlappingEnd - $overlappingStart + 1;
+//                $overlappingDays = $overlappingEnd - $overlappingStart + 1;
             } else if ($this->isTargetMonth($current, Carbon::parse($end)->format("Y-m"))) {
                 $overlappingStart = Carbon::parse($end)->startOfMonth()->day;
                 $overlappingEnd = Carbon::parse($end)->day;
-                $overlappingDays = $overlappingEnd - $overlappingStart + 1;
+//                $overlappingDays = $overlappingEnd - $overlappingStart + 1;
             }
+            if ($overlappingEnd - $overlappingStart <= 0) {
+                continue;
+            }
+            $overlappingDays = $overlappingEnd - $overlappingStart + 1;
             $budget += floor($item["Amount"] * $overlappingDays / Carbon::parse($current)->daysInMonth);
         }
 
