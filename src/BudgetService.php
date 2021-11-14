@@ -32,11 +32,6 @@ class BudgetService
         $budget = 0;
 
         foreach ($this->queries as $item) {
-            $startedInMonth = Carbon::parse($start)->daysInMonth;
-            $endDaysInMonth = Carbon::parse($end)->daysInMonth;
-
-            $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
-            $endTotal = Carbon::parse($end)->day;
 
             $newYearMonth = substr($item["YearMonth"], 0, 4) . "-" . substr($item["YearMonth"], 4, 2);
 
@@ -46,11 +41,15 @@ class BudgetService
                     $daysInMonth = Carbon::parse($startDate)->daysInMonth;
                     return floor($item["Amount"] * $betweenDays / $daysInMonth);
                 } else {
+                    $startedInMonth = Carbon::parse($start)->daysInMonth;
+                    $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
                     $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
                 }
             } elseif ($this->isInMiddleMonth($newYearMonth, $start, $end, $endDate)) {
                 $budget += floor($item["Amount"]);
             } else if ($this->isTargetMonth($newYearMonth, $endDate)) {
+                $endDaysInMonth = Carbon::parse($end)->daysInMonth;
+                $endTotal = Carbon::parse($end)->day;
                 $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
             }
         }
