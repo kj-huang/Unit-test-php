@@ -57,7 +57,8 @@ class BudgetService
                 $overlappingDays = 0;
             }
 
-            $budget += floor($budgetEntity->getAmount() * $overlappingDays / Carbon::parse($current)->daysInMonth);
+//            $budget += floor($budgetEntity->getAmount() * $overlappingDays / Carbon::parse($current)->daysInMonth);
+            $budget += floor($budgetEntity->getAmount() * $overlappingDays / $budgetEntity->currentDaysInMonth());
         }
 
         return $budget;

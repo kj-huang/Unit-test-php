@@ -64,4 +64,12 @@ class Budget
     {
         return Carbon::parse($this->getFormatCurrentDateTime())->endOfMonth()->day;
     }
+
+    /**
+     * @return string
+     */
+    public function currentDaysInMonth(): string
+    {
+        return Carbon::parse($this->getFormatCurrentDateTime())->daysInMonth;
+    }
 }
