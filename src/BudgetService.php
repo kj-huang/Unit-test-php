@@ -32,26 +32,24 @@ class BudgetService
         $budget = 0;
 
         foreach ($this->queries as $item) {
-            if ($this->isSameMonth($startDate, $endDate) && $this->isTargetStartMonth($item["YearMonth"], $startDate)) {
-                $dateNumber1 = Carbon::parse($start)->diffInDays($end, false) + 1;
-                $daysInMonth1 = Carbon::parse($startDate)->daysInMonth;
-                list($dateNumber, $daysInMonth) = (array($dateNumber1, $daysInMonth1));
-                return floor($item["Amount"] * $dateNumber / $daysInMonth);
+            $startedInMonth = Carbon::parse($start)->daysInMonth;
+            $endDaysInMonth = Carbon::parse($end)->daysInMonth;
+
+            $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
+            $endTotal = Carbon::parse($end)->day;
+
+            if ($this->isTargetStartMonth($item["YearMonth"], $startDate)) {
+                if ($this->isSameMonth($startDate, $endDate)) {
+                    $dateNumber1 = Carbon::parse($start)->diffInDays($end, false) + 1;
+                    $daysInMonth1 = Carbon::parse($startDate)->daysInMonth;
+                    list($dateNumber, $daysInMonth) = (array($dateNumber1, $daysInMonth1));
+                    return floor($item["Amount"] * $dateNumber / $daysInMonth);
+                } else $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
             } else {
-                $startedInMonth = Carbon::parse($start)->daysInMonth;
-                $endDaysInMonth = Carbon::parse($end)->daysInMonth;
-
-                $startTotal = $startedInMonth - Carbon::parse($start)->day + 1;
-                $endTotal = Carbon::parse($end)->day;
-
-                if ($this->isTargetStartMonth($item["YearMonth"], $startDate)) {
-                    $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
-                } else {
-                    if ($this->isInMiddleMonth($item["YearMonth"], $start, $end, $endDate)) {
-                        $budget += floor($item["Amount"]);
-                    } else if ($this->isTargetEndMonth($item["YearMonth"], $endDate)) {
-                        $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
-                    }
+                if ($this->isInMiddleMonth($item["YearMonth"], $start, $end, $endDate)) {
+                    $budget += floor($item["Amount"]);
+                } else if ($this->isTargetEndMonth($item["YearMonth"], $endDate)) {
+                    $budget += floor($item["Amount"] * $endTotal / $endDaysInMonth);
                 }
             }
         }
