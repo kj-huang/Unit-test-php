@@ -42,8 +42,7 @@ class BudgetService
                 if ($this->isSameMonth($startDate, $endDate)) {
                     $dateNumber1 = Carbon::parse($start)->diffInDays($end, false) + 1;
                     $daysInMonth1 = Carbon::parse($startDate)->daysInMonth;
-                    list($dateNumber, $daysInMonth) = (array($dateNumber1, $daysInMonth1));
-                    return floor($item["Amount"] * $dateNumber / $daysInMonth);
+                    return floor($item["Amount"] * $dateNumber1 / $daysInMonth1);
                 } else $budget += floor($item["Amount"] * $startTotal / $startedInMonth);
             } else {
                 if ($this->isInMiddleMonth($item["YearMonth"], $start, $end, $endDate)) {
