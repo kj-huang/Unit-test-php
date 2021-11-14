@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Carbon\Carbon;
+
 class Budget
 {
     /**
@@ -34,13 +36,24 @@ class Budget
     /**
      * @return string
      */
-    public function getYearMonth(): string
+    private function getYearMonth(): string
     {
         return $this->yearMonth;
     }
 
+    /**
+     * @return string
+     */
     public function getFormatCurrentDateTime(): string
     {
         return substr($this->getYearMonth(), 0, 4) . "-" . substr($this->getYearMonth(), 4, 2);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstDay(): string
+    {
+        return Carbon::parse($this->getFormatCurrentDateTime())->startOfMonth()->day;
     }
 }

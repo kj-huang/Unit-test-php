@@ -31,7 +31,6 @@ class BudgetService
 
         foreach ($this->queries as $b => $budgetEntity) {
 
-//            $current = substr($budgetEntity->getYearMonth(), 0, 4) . "-" . substr($budgetEntity->getYearMonth(), 4, 2);
             $current = $budgetEntity->getFormatCurrentDateTime();
             $overlappingEnd = 0;
             $overlappingStart = 0;
@@ -44,10 +43,12 @@ class BudgetService
                     $overlappingStart = Carbon::parse($current)->endOfMonth()->day - Carbon::parse($end)->day + 1;
                 }
             } else if ($this->isInMiddleMonth($current, $start, $end)) {
-                $overlappingStart = Carbon::parse($current)->startOfMonth()->day;
+//                $overlappingStart = Carbon::parse($current)->startOfMonth()->day;
+                $overlappingStart = $budgetEntity->getFirstDay();
                 $overlappingEnd = Carbon::parse($current)->endOfMonth()->day;
             } else if ($this->isTargetMonth($current, Carbon::parse($end)->format("Y-m"))) {
-                $overlappingStart = Carbon::parse($current)->startOfMonth()->day;
+//                $overlappingStart = Carbon::parse($current)->startOfMonth()->day;
+                $overlappingStart = $budgetEntity->getFirstDay();
                 $overlappingEnd = Carbon::parse($end)->day;
             }
 
