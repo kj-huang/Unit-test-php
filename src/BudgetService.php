@@ -30,7 +30,7 @@ class BudgetService
         $budget = 0;
 
         foreach ($this->queries as $b => $budgetEntity) {
-            $overlappingDays = $this->getOverlappingDays($budgetEntity, $start, $end);
+            $overlappingDays = $this->getOverlappingDays($budgetEntity, new Period($start, $end));
             $budget += floor($budgetEntity->getAmount() * $overlappingDays / $budgetEntity->currentDaysInMonth());
         }
 
@@ -65,7 +65,7 @@ class BudgetService
      */
     protected function isInMiddleMonth($yearMonth, string $start, string $end): bool
     {
-        return Carbon::parse($yearMonth)->between($start, $end) && Carbon::parse($yearMonth)->format("Y-m") !== Carbon::parse($end)->format("Y-m");;
+        return Carbon::parse($yearMonth)->between($start, $end) && Carbon::parse($yearMonth)->format("Y-m") !== Carbon::parse($end)->format("Y-m");
     }
 
     /**
@@ -74,34 +74,91 @@ class BudgetService
      * @param string $end
      * @return int|mixed
      */
-    protected function getOverlappingDays($budgetEntity, string $start, string $end)
+    protected function getOverlappingDays($budgetEntity, $period)
     {
         $current = $budgetEntity->getFormatCurrentDateTime();
         $overlappingEnd = 0;
         $overlappingStart = 0;
-        if ($this->isTargetMonth($current, Carbon::parse($start)->format("Y-m"))) {
-            if (Carbon::parse($start)->month !== Carbon::parse($end)->month) {
+        if ($this->isTargetMonth($current, $period->getFormatStart())) {
+            if ($period->getStartMonth() !== $period->getEndMonth()) {
                 $overlappingEnd = $budgetEntity->getLastDay();
-                $overlappingStart = Carbon::parse($start)->day;
+                $overlappingStart = $period->getStartDate();
             } else {
                 $overlappingEnd = $budgetEntity->getLastDay();
-                $overlappingStart = $budgetEntity->getLastDay() - Carbon::parse($end)->day + 1;
+                $overlappingStart = $budgetEntity->getLastDay() - $period->getEndDate() + 1;
             }
-        } else if ($this->isInMiddleMonth($current, $start, $end)) {
+        } else if ($this->isInMiddleMonth($current, $period->getStart(), $period->getEnd())) {
             $overlappingStart = $budgetEntity->getFirstDay();
             $overlappingEnd = $budgetEntity->getLastDay();
-        } else if ($this->isTargetMonth($current, Carbon::parse($end)->format("Y-m"))) {
+        } else if ($this->isTargetMonth($current, $period->getFormatEnd())) {
             $overlappingStart = $budgetEntity->getFirstDay();
-            $overlappingEnd = Carbon::parse($end)->day;
+            $overlappingEnd = $period->getEndDate();
         }
 
-//        //TODO code smell: but making this code can extract method later
-//        if ($overlappingEnd - $overlappingStart > 0) {
-//            $overlappingDays = $overlappingEnd - $overlappingStart + 1;
-//        } else {
-//            $overlappingDays = 0;
-//        }
-//        return $overlappingDays;
         return $overlappingEnd - $overlappingStart > 0 ? $overlappingEnd - $overlappingStart + 1 : 0;
+    }
+}
+
+class Period
+{
+    /**
+     * @var int
+     */
+    public $start;
+    /**
+     * @var int
+     */
+    public $end;
+
+    /**
+     * @param string $start
+     * @param string $end
+     */
+    public function __construct(string $start, string $end)
+    {
+        $this->start = Carbon::parse($start);
+        $this->end = Carbon::parse($end);
+
+    }
+
+    public function getStart()
+    {
+        return $this->start;
+    }
+
+    public function getEnd()
+    {
+        return $this->end;
+    }
+
+    public function getStartDate()
+    {
+        return $this->start->day;
+    }
+
+    public function getEndDate()
+    {
+        return $this->end->day;
+    }
+
+    public function getStartMonth()
+    {
+        return $this->start->month;
+    }
+
+    public function getEndMonth()
+    {
+        return $this->end->month;
+    }
+
+    public function getFormatStart()
+    {
+        var_dump($this->start->format("Y-m"));
+        return $this->start->format("Y-m");
+    }
+
+    public function getFormatEnd()
+    {
+        return $this->end->format("Y-m");
     }
 }
