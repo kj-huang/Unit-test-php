@@ -24,29 +24,17 @@ class BudgetService
 
     public function query(string $start, string $end)
     {
-        if ($this->isInvalidRange($start, $end)) {
-            return 0;
-        }
         $budget = 0;
-
-        foreach ($this->queries as $b => $budgetEntity) {
-            $overlappingDays = $this->getOverlappingDays($budgetEntity, new Period($start, $end));
-            $budget += floor($budgetEntity->getAmount() * $overlappingDays / $budgetEntity->currentDaysInMonth());
+        $period = new Period($start, $end);
+        if ($period->isValidRange()) {
+            foreach ($this->queries as $b => $budgetEntity) {
+                $overlappingDays = $this->getOverlappingDays($budgetEntity, new Period($start, $end));
+                $budget += floor($budgetEntity->getAmount() * $overlappingDays / $budgetEntity->currentDaysInMonth());
+            }
         }
 
         return $budget;
     }
-
-    /**
-     * @param string $start
-     * @param string $end
-     * @return bool
-     */
-    protected function isInvalidRange(string $start, string $end): bool
-    {
-        return Carbon::parse($start)->diffInDays($end, false) < 0;
-    }
-
 
     /**
      * @param $budgetEntity
