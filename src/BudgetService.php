@@ -28,8 +28,7 @@ class BudgetService
         $period = new Period($start, $end);
         if ($period->isValidRange()) {
             foreach ($this->queries as $b => $budgetEntity) {
-                $overlappingDays = $this->getOverlappingDays($budgetEntity, $period);
-                $budget += floor($budgetEntity->calculateTotals($overlappingDays));
+                $budget += floor($budgetEntity->calculateTotals($this->getOverlappingDays($budgetEntity, $period)));
             }
         }
 
