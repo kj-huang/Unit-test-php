@@ -26,6 +26,16 @@ class Budget
     }
 
     /**
+     * @param $budgetEntity
+     * @param $overlappingDays
+     * @return float|int
+     */
+    public function calculateTotals($overlappingDays)
+    {
+        return $this->getAmount() * $overlappingDays / $this->currentDaysInMonth();
+    }
+
+    /**
      * @return int
      */
     public function getAmount(): int

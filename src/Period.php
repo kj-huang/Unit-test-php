@@ -84,4 +84,40 @@ class Period
     {
         return Carbon::parse($yearMonth)->isSameMonth($this->getFormatStart());
     }
+
+    /**
+     * @return bool
+     */
+    public function isValidRange(): bool
+    {
+        return Carbon::parse($this->start)->diffInDays($this->end, false) > 0;
+    }
+
+    /**
+     * @param $budgetEntity
+     * @return int|mixed
+     */
+    public function getOverlappingDays($budgetEntity)
+    {
+        $current = $budgetEntity->getFormatCurrentDateTime();
+        $overlappingEnd = 0;
+        $overlappingStart = 0;
+        if ($this->isTargetStartMonth($current)) {
+            if ($this->getStartMonth() !== $this->getEndMonth()) {
+                $overlappingEnd = $budgetEntity->getLastDay();
+                $overlappingStart = $this->getStartDate();
+            } else {
+                $overlappingEnd = $budgetEntity->getLastDay();
+                $overlappingStart = $budgetEntity->getLastDay() - $this->getEndDate() + 1;
+            }
+        } else if ($this->isInMiddleMonth($current)) {
+            $overlappingStart = $budgetEntity->getFirstDay();
+            $overlappingEnd = $budgetEntity->getLastDay();
+        } else if ($this->isTargetEndMonth($current)) {
+            $overlappingStart = $budgetEntity->getFirstDay();
+            $overlappingEnd = $this->getEndDate();
+        }
+
+        return $overlappingEnd - $overlappingStart > 0 ? $overlappingEnd - $overlappingStart + 1 : 0;
+    }
 }
