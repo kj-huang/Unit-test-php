@@ -47,21 +47,10 @@ class BudgetService
         return Carbon::parse($start)->diffInDays($end, false) < 0;
     }
 
-    /**
-     * @param $yearMonth
-     * @param $startDate
-     * @return bool
-     */
-    protected function isTargetMonth($yearMonth, $startDate): bool
-    {
-        return Carbon::parse($yearMonth)->isSameMonth($startDate);
-    }
-
 
     /**
      * @param $budgetEntity
-     * @param string $start
-     * @param string $end
+     * @param Period $period
      * @return int|mixed
      */
     protected function getOverlappingDays($budgetEntity, Period $period)
@@ -69,7 +58,7 @@ class BudgetService
         $current = $budgetEntity->getFormatCurrentDateTime();
         $overlappingEnd = 0;
         $overlappingStart = 0;
-        if ($this->isTargetMonth($current, $period->getFormatStart())) {
+        if ($period->isTargetStartMonth($current)) {
             if ($period->getStartMonth() !== $period->getEndMonth()) {
                 $overlappingEnd = $budgetEntity->getLastDay();
                 $overlappingStart = $period->getStartDate();
@@ -80,7 +69,7 @@ class BudgetService
         } else if ($period->isInMiddleMonth($current)) {
             $overlappingStart = $budgetEntity->getFirstDay();
             $overlappingEnd = $budgetEntity->getLastDay();
-        } else if ($this->isTargetMonth($current, $period->getFormatEnd())) {
+        } else if ($period->isTargetEndMonth($current)) {
             $overlappingStart = $budgetEntity->getFirstDay();
             $overlappingEnd = $period->getEndDate();
         }
@@ -150,5 +139,23 @@ class Period
     public function isInMiddleMonth($yearMonth): bool
     {
         return Carbon::parse($yearMonth)->between($this->start, $this->end) && Carbon::parse($yearMonth)->format("Y-m") !== Carbon::parse($this->end)->format("Y-m");
+    }
+
+    /**
+     * @param $yearMonth
+     * @return bool
+     */
+    public function isTargetEndMonth($yearMonth): bool
+    {
+        return Carbon::parse($yearMonth)->isSameMonth($this->getFormatEnd());
+    }
+
+    /**
+     * @param $yearMonth
+     * @return bool
+     */
+    public function isTargetStartMonth($yearMonth): bool
+    {
+        return Carbon::parse($yearMonth)->isSameMonth($this->getFormatStart());
     }
 }
