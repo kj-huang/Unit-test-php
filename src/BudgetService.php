@@ -59,13 +59,12 @@ class BudgetService
 
     /**
      * @param $yearMonth
-     * @param string $start
-     * @param string $end
+     * @param Period $period
      * @return bool
      */
-    protected function isInMiddleMonth($yearMonth, string $start, string $end): bool
+    protected function isInMiddleMonth($yearMonth, Period $period): bool
     {
-        return Carbon::parse($yearMonth)->between($start, $end) && Carbon::parse($yearMonth)->format("Y-m") !== Carbon::parse($end)->format("Y-m");
+        return Carbon::parse($yearMonth)->between($period->getStart(), $period->getEnd()) && Carbon::parse($yearMonth)->format("Y-m") !== Carbon::parse($period->getEnd())->format("Y-m");
     }
 
     /**
@@ -74,7 +73,7 @@ class BudgetService
      * @param string $end
      * @return int|mixed
      */
-    protected function getOverlappingDays($budgetEntity, $period)
+    protected function getOverlappingDays($budgetEntity, Period $period)
     {
         $current = $budgetEntity->getFormatCurrentDateTime();
         $overlappingEnd = 0;
@@ -87,7 +86,7 @@ class BudgetService
                 $overlappingEnd = $budgetEntity->getLastDay();
                 $overlappingStart = $budgetEntity->getLastDay() - $period->getEndDate() + 1;
             }
-        } else if ($this->isInMiddleMonth($current, $period->getStart(), $period->getEnd())) {
+        } else if ($this->isInMiddleMonth($current, $period)) {
             $overlappingStart = $budgetEntity->getFirstDay();
             $overlappingEnd = $budgetEntity->getLastDay();
         } else if ($this->isTargetMonth($current, $period->getFormatEnd())) {
